@@ -1,0 +1,46 @@
+class: CommandLineTool
+cwlVersion: v1.0
+baseCommand: ["sh", "init-env.sh"]
+
+requirements:
+  InitialWorkDirRequirement:  
+    listing:
+      - entryname: init-env.sh
+        entry: |-
+          export SPHENIX_BUILD="$(inputs.build)"
+          export SPHENIX_NEVENTS="$(inputs.nevents)"
+          export SPHENIX_TYPE="$(inputs.type)"
+          export SPHENIX_OUTFILE="$(inputs.outfile)"
+          export SPHENIX_OUTDIR="$(inputs.outdir)"
+          export SPHENIX_RUNNUM="$(inputs.runnumber)"
+          if [ -z $1 ]
+             then
+                export SPHENIX_SEQNUM=00001
+             else
+                export SPHENIX_SEQNUM=$1
+          fi	
+          echo "Initialize sPHENIX Production Environment"
+          echo `hostname`
+          source /opt/sphenix/core/bin/sphenix_setup.sh $SPHENIX_BUILD
+          echo build      = $SPHENIX_BUILD
+          echo nevents    = $SPHENIX_NEVENTS
+          echo type       = $SPHENIX_TYPE
+          echo outfile    = $SPHENIX_OUTFILE
+          echo outdir     = $SPHENIX_OUTDIR
+          echo run number = $SPHENIX_RUNNUM
+          echo sequence   = $SPHENIX_SEQNUM
+
+inputs:
+  build: string
+  nevents: int
+  type: string
+  outfile: string
+  outdir: string
+  runnumber: int
+
+outputs:
+  example_out:
+    type: stdout
+
+stdout: output.txt
+
