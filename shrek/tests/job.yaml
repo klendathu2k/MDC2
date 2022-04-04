@@ -1,0 +1,42 @@
+# Specifies a unique name for the job
+jobname: g4charm
+
+# Extra panda flags (such as number of jobs to run)
+extra_panda_args: --nJobs 5
+
+# sPHENIX software build level
+build: mdc2.7
+nevents: 100
+type: Charm
+outfile: TestSubmission 
+outdir: /sphenix/user/sphnxpro/shrek/pass1/out
+logdir: /sphenix/user/sphnxpro/shrek/pass1/log
+jobdir: /sphenix/u/jwebb2/work/2022/SHREK/MDC2
+
+runnumber: 1234567890
+
+# Commands to stage files required to run the code
+stagecmd: |-
+  ln -s /sphenix/u/jwebb2/work/2022/SHREK/MDC2/submit/HF_pp200_signal/pass1/rundir/* .
+
+# Command block
+commands: |-
+  echo execute a predefined script
+  run_hfprod_pass1.sh
+  echo or any arbitrary set of unix commands...
+  # e.g. root.exe -q -b Fun4All.C
+
+# Copy back block
+copyback: |-
+  ls > g4charm_$RUNNUM_$SEQNUM.manifest
+  
+
+# List of files (wildcards allowed)
+primaryFileList: 
+  - file:/sphenix/user/jwebb/shrek/test/file1.txt
+  - file:/sphenix/user/jwebb/shrek/test/file2.txt
+  - file:/sphenix/user/jwebb/shrek/test/file?.txt 
+
+
+
+
