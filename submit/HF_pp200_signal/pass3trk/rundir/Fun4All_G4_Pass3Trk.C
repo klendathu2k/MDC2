@@ -226,7 +226,7 @@ int Fun4All_G4_Pass3Trk(
   InputRegister();
 
   // set up production relatedstuff
-    Enable::PRODUCTION = true;
+    Enable::PRODUCTION = false;
 
 
   //======================

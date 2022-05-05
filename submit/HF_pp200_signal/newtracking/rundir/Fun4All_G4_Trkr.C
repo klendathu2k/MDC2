@@ -220,7 +220,7 @@ int Fun4All_G4_Trkr(
   InputRegister();
 
   // set up production relatedstuff
-     Enable::PRODUCTION = true;
+     Enable::PRODUCTION = false;
 
   //======================
   // Write the DST

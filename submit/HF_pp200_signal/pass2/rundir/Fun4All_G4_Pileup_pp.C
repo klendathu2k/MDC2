@@ -39,7 +39,7 @@ int Fun4All_G4_Pileup_pp(
   auto rc = recoConsts::instance();
 
   // set up production relatedstuff
-  Enable::PRODUCTION = true;
+  Enable::PRODUCTION = false;
   Enable::DSTOUT = true;
   DstOut::OutputDir = outdir;
   Enable::GLOBAL_FASTSIM = true;

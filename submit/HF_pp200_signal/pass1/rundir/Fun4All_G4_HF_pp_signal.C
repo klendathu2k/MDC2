@@ -264,7 +264,7 @@ int Fun4All_G4_HF_pp_signal(
   se->registerSubsystem(head);
 
   // set up production relatedstuff
-  Enable::PRODUCTION = true;
+  Enable::PRODUCTION = false;
 
   //======================
   // Write the DST
