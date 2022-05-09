@@ -19,13 +19,14 @@ namespace PRODUCTION
 
 void Production_CreateOutputDir()
 {
+#if 0 // shrek test
   PRODUCTION::SaveOutputDir = DstOut::OutputDir;
   string toreplace("/sphenix/lustre01/sphnxpro");
   string mkdircmd;
   size_t strpos = DstOut::OutputDir.find(toreplace);
   if (strpos == string::npos)
   {
-// check if directory already exists, mkdirs can hang up the system if we have gazillions of them
+    // check if directory already exists, mkdirs can hang up the system if we have gazillions of them
     DIR *dr;
     struct dirent *en;
     dr = opendir(DstOut::OutputDir.c_str());
@@ -47,10 +48,12 @@ void Production_CreateOutputDir()
     mkdircmd = "if [[ ! `mcs3 stat " + DstOut::OutputDir + "` ]]; then mcs3 mb " + DstOut::OutputDir + "; fi";
   }
   gSystem->Exec(mkdircmd.c_str());
+#endif
 }
 
 void Production_MoveOutput()
 {
+#if 0 // shrek test
   if (Enable::DSTOUT)
   {
     string copyscript = "copyscript.pl";
@@ -70,5 +73,6 @@ void Production_MoveOutput()
     cout << "mvcmd: " << mvcmd << endl;
     gSystem->Exec(mvcmd.c_str());
   }
+#endif
 }
 #endif

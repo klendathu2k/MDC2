@@ -15,6 +15,7 @@ namespace PRODUCTION
 
 void Production_CreateOutputDir()
 {
+#if 0 // shrek test
   PRODUCTION::SaveOutputDir = DstOut::OutputDir;
   string toreplace("/sphenix/lustre01/sphnxpro");
   string mkdircmd;
@@ -29,10 +30,12 @@ void Production_CreateOutputDir()
     mkdircmd = "mcs3 mb " + DstOut::OutputDir;
   }
   gSystem->Exec(mkdircmd.c_str());
+#endif
 }
 
 void Production_MoveOutput()
 {
+#if 0 // shrek test
   if (Enable::DSTOUT)
   {
     string copyscript = "copyscript.pl";
@@ -52,5 +55,6 @@ void Production_MoveOutput()
     cout << "mvcmd: " << mvcmd << endl;
     gSystem->Exec(mvcmd.c_str());
   }
+#if 0 // shrek test
 }
 #endif

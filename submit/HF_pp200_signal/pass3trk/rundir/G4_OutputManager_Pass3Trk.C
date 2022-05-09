@@ -49,6 +49,7 @@ void AddCommonNodes(Fun4AllOutputManager *out)
 
 void DstOutput_move()
 {
+#if 0 // shrek test
   string copyscript = "copyscript.pl";
   ifstream f(copyscript);
   bool scriptexists = f.good();
@@ -71,6 +72,7 @@ void DstOutput_move()
       gSystem->Exec(mvcmd.c_str());
     }
   }
+#endif
 }
 
 #endif
