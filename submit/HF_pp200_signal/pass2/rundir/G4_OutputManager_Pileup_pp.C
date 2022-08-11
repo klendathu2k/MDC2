@@ -9,6 +9,8 @@
 #include <fun4all/Fun4AllOutputManager.h>
 #include <fun4all/Fun4AllServer.h>
 
+#include <iostream>
+
 namespace OUTPUTMANAGER
 {
   set<string> outfiles;
@@ -19,6 +21,8 @@ void AddCommonNodes(Fun4AllOutputManager *out);
 void CreateDstOutput(int runnumber, int segment, const string &quarkfilter)
 {
   auto se = Fun4AllServer::instance();
+
+  std::cout << "CreateDstOutput" << std::endl;
 
   char segrun[100];
   snprintf(segrun,100,"%s_3MHz-%010d-%05d",quarkfilter.c_str(),runnumber,segment);
@@ -95,7 +99,7 @@ void DstOutput_move()
       {
 	mvcmd = "cp " + *iter + " " + PRODUCTION::SaveOutputDir;
       }
-      gSystem->Exec(mvcmd.c_str());
+      //$$$      gSystem->Exec(mvcmd.c_str());
     }
   }
 #endif

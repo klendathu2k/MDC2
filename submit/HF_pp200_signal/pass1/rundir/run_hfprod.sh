@@ -3,19 +3,19 @@ export USER="$(id -u -n)"
 export LOGNAME=${USER}
 export HOME=/sphenix/u/${USER}
 
-source /opt/sphenix/core/bin/sphenix_setup.sh -n mdc2.7
+source /opt/sphenix/core/bin/sphenix_setup.sh -n pro
 
 hostname
 
 echo running: run_hfprod.sh $*
 
-if [[ ! -z "$_CONDOR_SCRATCH_DIR" && -d $_CONDOR_SCRATCH_DIR ]]
-then
-    cd $_CONDOR_SCRATCH_DIR
-    rsync -av /sphenix/u/sphnxpro/MDC2/submit/HF_pp200_signal/pass1/rundir/* .
-else
-    echo condor scratch NOT set
-fi
+#$$$if [[ ! -z "$_CONDOR_SCRATCH_DIR" && -d $_CONDOR_SCRATCH_DIR ]]
+#$$$then
+#$$$    cd $_CONDOR_SCRATCH_DIR
+#$$$    rsync -av /sphenix/u/sphnxpro/MDC2/submit/HF_pp200_signal/pass1/rundir/* .
+#$$$else
+#$$$    echo condor scratch NOT set
+#$$$fi
 
 # arguments 
 # $1: number of events
@@ -43,17 +43,19 @@ filename=HF_pp200_signal_pass1_$2
 txtfilename=${filename}-${runnumber}-${sequence}.txt
 jsonfilename=${filename}-${runnumber}-${sequence}.json
 
-echo running prmon  --filename $txtfilename --json-summary $jsonfilename -- root.exe -q -b Fun4All_G4_HF_pp_signal.C\($1,\"$2\",\"$3\",\"\",0,\"$4\"\)
-prmon  --filename $txtfilename --json-summary $jsonfilename -- root.exe -q -b Fun4All_G4_HF_pp_signal.C\($1,\"$2\",\"$3\",\"\",0,\"$4\"\)
+#$$$echo running prmon  --filename $txtfilename --json-summary $jsonfilename -- root.exe -q -b Fun4All_G4_HF_pp_signal.C\($1,\"$2\",\"$3\",\"\",0,\"$4\"\)
+#$$$prmon  --filename $txtfilename --json-summary $jsonfilename -- 
 
-rsyncdirname=/sphenix/user/sphnxpro/prmon/HF_pp200_signal/pass1_$2
+root.exe -q -b Fun4All_G4_HF_pp_signal.C\($1,\"$2\",\"$3\",\"\",0,\"$4\"\)
 
-if [ ! -d $rsyncdirname ]
-then
-mkdir -p $rsyncdirname
-fi
-rsync -av $txtfilename $rsyncdirname
-rsync -av $jsonfilename $rsyncdirname
+#$$$rsyncdirname=/sphenix/user/sphnxpro/prmon/HF_pp200_signal/pass1_$2
+
+#$$$if [ ! -d $rsyncdirname ]
+#$$$then
+#$$$mkdir -p $rsyncdirname
+#$$$fi
+#$$$rsync -av $txtfilename $rsyncdirname
+#$$$rsync -av $jsonfilename $rsyncdirname
 
 
 echo "script done"

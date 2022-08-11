@@ -3,7 +3,7 @@ export USER="$(id -u -n)"
 export LOGNAME=${USER}
 export HOME=/sphenix/u/${USER}
 
-source /opt/sphenix/core/bin/sphenix_setup.sh -n mdc2.7
+source /opt/sphenix/core/bin/sphenix_setup.sh -n mdc2.8
 
 hostname
 
@@ -19,20 +19,20 @@ else
 export GSEARCHPATH=.:PG:LUSTRE:XROOTD:DCACHE
 fi
 
-if [[ ! -z "$_CONDOR_SCRATCH_DIR" && -d $_CONDOR_SCRATCH_DIR ]]
-then
-    cd $_CONDOR_SCRATCH_DIR
-    rsync -av /sphenix/u/sphnxpro/MDC2/submit/HF_pp200_signal/pass2/rundir/* .
-    getinputfiles.pl $2
-    if [ $? -ne 0 ]
-    then
-	echo error from getinputfiles.pl $2, exiting
-	exit -1
-    fi
-else
-    echo condor scratch NOT set
-    exit -1
-fi
+#if [[ ! -z "$_CONDOR_SCRATCH_DIR" && -d $_CONDOR_SCRATCH_DIR ]]
+#then
+#    cd $_CONDOR_SCRATCH_DIR
+#    rsync -av /sphenix/u/sphnxpro/MDC2/submit/HF_pp200_signal/pass2/rundir/* .
+#    getinputfiles.pl $2
+#    if [ $? -ne 0 ]
+#    then#
+##	echo error from getinputfiles.pl $2, exiting
+#	exit -1
+#    fi
+#else
+#    echo condor scratch NOT set
+#    exit -1
+#fi
 
 # arguments 
 # $1: number of output events
@@ -61,17 +61,19 @@ txtfilename=${filename}-${runnumber}-${sequence}.txt
 jsonfilename=${filename}-${runnumber}-${sequence}.json
 
 
-echo running prmon  --filename $txtfilename --json-summary $jsonfilename -- root.exe -q -b Fun4All_G4_Pileup_pp.C\($1,\"$2\",\"$3\",\"$4\",\"$5\"\)
-prmon  --filename $txtfilename --json-summary $jsonfilename -- root.exe -q -b  Fun4All_G4_Pileup_pp.C\($1,\"$2\",\"$3\",\"$4\",\"$5\"\)
+#echo running prmon  --filename $txtfilename --json-summary $jsonfilename -- root.exe -q -b Fun4All_G4_Pileup_pp.C\($1,\"$2\",\"$3\",\"$4\",\"$5\"\)
+#prmon  --filename $txtfilename --json-summary $jsonfilename -- 
 
-rsyncdirname=/sphenix/user/sphnxpro/prmon/HF_pp200_signal/pass2_$5
-if [ ! -d $rsyncdirname ]
-then
-mkdir -p $rsyncdirname
-fi
+root.exe -q -b  Fun4All_G4_Pileup_pp.C\($1,\"$2\",\"$3\",\"$4\",\"$5\"\)
 
-rsync -av $txtfilename $rsyncdirname
-rsync -av $jsonfilename $rsyncdirname
+#rsyncdirname=/sphenix/user/sphnxpro/prmon/HF_pp200_signal/pass2_$5
+#if [ ! -d $rsyncdirname ]
+#then
+#mkdir -p $rsyncdirname
+#fi
+
+#rsync -av $txtfilename $rsyncdirname
+#rsync -av $jsonfilename $rsyncdirname
 
 
 echo "script done"

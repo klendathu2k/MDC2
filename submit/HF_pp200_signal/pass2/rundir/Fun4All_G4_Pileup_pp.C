@@ -39,7 +39,7 @@ int Fun4All_G4_Pileup_pp(
   auto rc = recoConsts::instance();
 
   // set up production relatedstuff
-  Enable::PRODUCTION = false;
+  Enable::PRODUCTION = true;
   Enable::DSTOUT = true;
   DstOut::OutputDir = outdir;
   Enable::GLOBAL_FASTSIM = true;
@@ -70,8 +70,11 @@ int Fun4All_G4_Pileup_pp(
   inpile->setCollisionRate(3e6); // 3MHz according to BUP
   // open file
   inpile->AddListFile(backgroundList);
+  {
+    inpile->Repeat();
+  }
   se->registerInputManager(inpile);
-
+  
   // output manager
   /* all the nodes from DST and RUN are saved to the output */
   //  auto out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
@@ -88,7 +91,7 @@ int Fun4All_G4_Pileup_pp(
   se->End();
   if (Enable::PRODUCTION)
   {
-    DstOutput_move();
+    //    DstOutput_move();
   }
   se->PrintTimer();
   std::cout << "All done" << std::endl;
