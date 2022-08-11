@@ -28,7 +28,7 @@ void Production_CreateOutputDir()
     DstOut::OutputDir.replace(DstOut::OutputDir.begin(),DstOut::OutputDir.begin()+toreplace.size(),"sphenixS3");
     mkdircmd = "mcs3 mb " + DstOut::OutputDir;
   }
-  gSystem->Exec(mkdircmd.c_str());
+  //  gSystem->Exec(mkdircmd.c_str());
 }
 
 void Production_MoveOutput()
@@ -55,7 +55,7 @@ void Production_MoveOutput()
       mvcmd = "mv " + fulloutfile + " " + PRODUCTION::SaveOutputDir;
     }
     cout << "mvcmd: " << mvcmd << endl;
-    gSystem->Exec(mvcmd.c_str());
+    //    gSystem->Exec(mvcmd.c_str());
   }
 }
 #endif
