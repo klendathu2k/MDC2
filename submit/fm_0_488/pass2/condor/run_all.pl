@@ -9,7 +9,7 @@ use DBI;
 
 
 my $outevents = 0;
-my $input_runnumber = 2;
+my $input_runnumber = 40;
 my $test;
 my $incremental;
 GetOptions("test"=>\$test, "increment"=>\$incremental);
@@ -38,13 +38,23 @@ if (! -f "outdir.txt")
 }
 my $outdir = `cat outdir.txt`;
 chomp $outdir;
-mkpath($outdir);
+if ($outdir =~ /lustre/)
+{
+    my $storedir = $outdir;
+    $storedir =~ s/\/sphenix\/lustre01\/sphnxpro/sphenixS3/;
+    my $makedircmd = sprintf("mcs3 mb %s",$storedir);
+    system($makedircmd);
+}
+else
+{
+  mkpath($outdir);
+}
 
 my %outfiletype = ();
 $outfiletype{"DST_BBC_G4HIT"} = 1;
 $outfiletype{"DST_CALO_G4HIT"} = 1;
 $outfiletype{"DST_TRKR_G4HIT"} = 1;
-$outfiletype{"DST_TRUTH_G4HIT"} = 1;
+$outfiletype{"DST_TRUTH_G4HIT"} = "DST_TRUTH";
 $outfiletype{"DST_VERTEX"} = 1;
 
 my $localdir=`pwd`;
@@ -85,6 +95,16 @@ while (my @res = $getfiles->fetchrow_array())
 	    }
 	    else
 	    {
+		my $newlfn = $outfiletype{$type};
+		if ($newlfn ne "1")
+		{
+		    $lfn =~ s/$type/$outfiletype{$type}/;
+		    $chkfile->execute($lfn);
+		    if ($chkfile->rows > 0)
+		    {
+			next;
+		    }
+		}
 		$foundall = 0;
 		last;
 	    }

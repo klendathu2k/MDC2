@@ -21,7 +21,8 @@ my @submitdir = (
 "JS_pp200_signal/pass2/condor",
 "JS_pp200_signal/pass3trk/condor",
 "JS_pp200_signal/pass3calo/condor",
-"JS_pp200_signal/pass4trk/condor"
+"JS_pp200_signal/pass4trk/condor",
+"JS_pp200_signal/pass5jet/condor"
 );
 
 my @quarkfilters = ("Charm");
@@ -45,7 +46,7 @@ foreach my $subdir (@submitdir)
     {
 	foreach my $qf (@quarkfilters)
 	{
-	    my $submitcmd = sprintf("perl run_all.pl 2000 %s -inc",$qf);
+	    my $submitcmd = sprintf("perl run_all.pl 20000 %s -inc",$qf);
 	    print "executing $submitcmd in $newdir\n";
 	    system($submitcmd);
 	}
@@ -54,7 +55,7 @@ foreach my $subdir (@submitdir)
     {
 	foreach my $qf (@jettriggers)
 	{
-	    my $submitcmd = sprintf("perl run_all.pl 2000 %s -inc",$qf);
+	    my $submitcmd = sprintf("perl run_all.pl 20000 %s -inc",$qf);
 	    print "executing $submitcmd in $newdir\n";
 	    system($submitcmd);
 	}

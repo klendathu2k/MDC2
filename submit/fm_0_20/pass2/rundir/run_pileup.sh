@@ -3,16 +3,21 @@ export USER="$(id -u -n)"
 export LOGNAME=${USER}
 export HOME=/sphenix/u/${USER}
 
-source /opt/sphenix/core/bin/sphenix_setup.sh -n mdc2.6
-
 hostname
 
-echo running: run_pileup.sh $*
+this_script=$BASH_SOURCE
+this_script=`readlink -f $this_script`
+this_dir=`dirname $this_script`
+echo rsyncing from $this_dir
+
+source /opt/sphenix/core/bin/sphenix_setup.sh -n new
+
+echo running: $this_script $*
 
 if [[ ! -z "$_CONDOR_SCRATCH_DIR" && -d $_CONDOR_SCRATCH_DIR ]]
 then
-  cd $_CONDOR_SCRATCH_DIR
-  rsync -av /sphenix/u/sphnxpro/MDC2/submit/fm_0_20/pass2/rundir/* .
+    cd $_CONDOR_SCRATCH_DIR
+    rsync -av $this_dir/* .
     getinputfiles.pl $2
     if [ $? -ne 0 ]
     then
@@ -56,9 +61,13 @@ jsonfilename=${filename}-${runnumber}-${sequence}.json
 echo running root.exe -q -b Fun4All_G4_Pileup.C\($1,\"$2\",\"$3\",\"$4\"\)
 prmon  --filename $txtfilename --json-summary $jsonfilename -- root.exe -q -b  Fun4All_G4_Pileup.C\($1,\"$2\",\"$3\",\"$4\"\)
 
-mkdir -p /sphenix/user/sphnxpro/prmon/fm_0_20/pass2
+rsyncdirname=/sphenix/user/sphnxpro/prmon/fm_0_20/pass2
+if [ ! -d $rsyncdirname ]
+then
+  mkdir -p $rsyncdirname
+fi
 
-rsync -av $txtfilename /sphenix/user/sphnxpro/prmon/fm_0_20/pass2
-rsync -av $jsonfilename /sphenix/user/sphnxpro/prmon/fm_0_20/pass2
+rsync -av $txtfilename $rsyncdirname
+rsync -av $jsonfilename $rsyncdirname
 
 echo "script done"

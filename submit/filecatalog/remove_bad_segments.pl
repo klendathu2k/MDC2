@@ -17,7 +17,8 @@ my $dsttype = "none";
 my $runnumber = 2;
 my $nopileup;
 my $verbose;
-GetOptions("kill"=>\$kill, "type:i"=>\$system, "dsttype:s"=>\$dsttype, "nopileup"=>\$nopileup, "runnumber:i" => \$runnumber, "verbose" => \$verbose);
+my $embed;
+GetOptions("dsttype:s"=>\$dsttype, "embed"=>\$embed, "kill"=>\$kill, "nopileup"=>\$nopileup, "runnumber:i" => \$runnumber, "type:i"=>\$system, "verbose" => \$verbose);
 
 my $dbh = DBI->connect("dbi:ODBC:FileCatalog","phnxrc") || die $DBI::error;
 $dbh->{LongReadLen}=2000; # full file paths need to fit in here
@@ -30,13 +31,18 @@ my %daughters = (
     "DST_BBC_G4HIT" => [ "DST_CALO_G4HIT", "DST_TRKR_G4HIT", "DST_TRUTH_G4HIT", "DST_VERTEX" ],
     "DST_CALO_G4HIT" => [ "DST_BBC_G4HIT", "DST_TRKR_G4HIT", "DST_TRUTH_G4HIT", "DST_VERTEX", "DST_CALO_CLUSTER" ],
     "DST_TRKR_G4HIT" => [ "DST_BBC_G4HIT", "DST_CALO_G4HIT", "DST_TRUTH_G4HIT", "DST_VERTEX", "DST_TRKR_CLUSTER" ],
-    "DST_TRUTH_G4HIT" => [ "DST_BBC_G4HIT", "DST_CALO_G4HIT", "DST_TRKR_G4HIT", "DST_VERTEX", "DST_TRKR_CLUSTER" ],
+    "DST_TRUTH_G4HIT" => [ "DST_BBC_G4HIT", "DST_CALO_G4HIT", "DST_TRKR_G4HIT", "DST_VERTEX", "DST_TRUTH" ],
     "DST_VERTEX" => [ "DST_BBC_G4HIT", "DST_CALO_G4HIT", "DST_TRKR_G4HIT", "DST_TRUTH_G4HIT", "DST_CALO_CLUSTER" ],
-    "DST_TRKR_CLUSTER" => [ "DST_TRUTH", "DST_TRACKS" ],
-    "DST_TRKR_HIT" => [ "DST_TRUTH", "DST_TRACKS" ],
-    "DST_TRUTH" => [ "DST_TRKR_HIT", "DST_TRKR_CLUSTER", "DST_TRACKS" ],
+    "DST_TRKR_CLUSTER" => [ "DST_TRACKSEEDS" ],
+    "DST_TRACKSEEDS" => [ "DST_TRACKS"],
+    "DST_TRKR_HIT" => [ "DST_TRUTH", "DST_TRKR_CLUSTER", "DST_NEWTRACKS" ],
+    "DST_TRUTH" => [ "DST_TRKR_HIT", "DST_NEWTRACKS", "DST_TRUTH_JET" ],
+#    "DST_TRKR_HIT" => [ "DST_TRUTH" ],
+#    "DST_TRUTH" => [ "DST_TRKR_HIT" ],
+    "DST_TRUTH_JET" => [ "" ],
     "DST_TRKR_HIT_DISTORT" => [ "DST_TRUTH_DISTORT", "DST_TRACKS_DISTORT" ],
     "DST_TRUTH_DISTORT" => [ "DST_TRKR_HIT_DISTORT", "DST_TRACKS_DISTORT" ],
+    "DST_NEWTRACKS" => [ "" ],
     "DST_TRACKS" => [ "" ],
     "DST_TRACKS_DISTORT" => [ "" ],
     "DST_CALO_CLUSTER" => [ "" ],
@@ -87,7 +93,9 @@ if ($#ARGV < 0)
     print "    8 : HF pythia8 Bottom\n";
     print "    9 : HF pythia8 CharmD0\n";
     print "   10 : HF pythia8 BottomD0\n";
-    print "   11 : JS pythia8 Jet R=.4\n";
+    print "   11 : JS pythia8 Jet R=0.4\n";
+    print "   12 : JS pythia8 Jet > 15GeV\n";
+    print "   13 : JS pythia8 Photon Jet\n";
     print "-dsttype:\n";
     foreach my $tp (sort keys %daughters)
     {
@@ -107,7 +115,7 @@ if( ! exists $daughters{$dsttype})
     }
     exit(0);
 }
-if ($system < 1 || $system > 11)
+if ($system < 1 || $system > 13)
 {
     print "use -type, valid values:\n";
     print "-type : production type\n";
@@ -121,7 +129,9 @@ if ($system < 1 || $system > 11)
     print "    8 : HF pythia8 Bottom\n";
     print "    9 : HF pythia8 CharmD0\n";
     print "   10 : HF pythia8 BottomD0\n";
-    print "   11 : JS pythia8 Jet R=.4\n";
+    print "   11 : JS pythia8 Jet R=0.4\n";
+    print "   12 : JS pythia8 Jet > 15GeV\n";
+    print "   13 : JS pythia8 Jet Photon Jet\n";
     exit(0);
 }
 
@@ -135,14 +145,16 @@ my %productionsubdir = (
     "DST_BBC_G4HIT" => "pass2",
     "DST_CALO_CLUSTER" => "pass3calo",
     "DST_CALO_G4HIT"=> "pass2",
-    "DST_TRACKS" => "pass4trk",
+    "DST_TRACKS" => "pass4_jobC",
+    "DST_TRACKSEEDS" => "pass4_jobA",
     "DST_TRACKS_DISTORT" => "pass4distort",
     "DST_TRKR_HIT" => "pass3trk",
     "DST_TRKR_HIT_DISTORT" => "pass3distort",
-    "DST_TRKR_CLUSTER" => "pass3trk",
+    "DST_TRKR_CLUSTER" => "pass4_job0",
     "DST_TRKR_G4HIT" => "pass2",
     "DST_TRUTH_G4HIT" => "pass2",
     "DST_TRUTH" => "pass3trk",
+    "DST_TRUTH_JET" => "pass5jet",
     "DST_TRUTH_DISTORT" => "pass3distort",
     "DST_VERTEX" => "pass2",
     "G4Hits" => "pass1"
@@ -153,6 +165,18 @@ if (defined $nopileup)
     $productionsubdir{"DST_TRKR_CLUSTER"} = "pass2_nopileup";
     $productionsubdir{"DST_TRUTH"} = "pass2_nopileup";
     $productionsubdir{"DST_TRACKS"} = "pass3_nopileup";
+}
+if (defined $embed)
+{
+    $productionsubdir{"DST_BBC_G4HIT"} = "pass2_embed";
+    $productionsubdir{"DST_CALO_CLUSTER"} = "pass3calo_embed";
+    $productionsubdir{"DST_CALO_G4HIT"} = "pass2_embed";
+    $productionsubdir{"DST_TRUTH"} = "pass3trk_embed";
+    $productionsubdir{"DST_TRUTH_G4HIT"} = "pass2_embed";
+    $productionsubdir{"DST_TRACKS"} = "pass4trk_embed";
+    $productionsubdir{"DST_TRKR_HIT"} = "pass3trk_embed";
+    $productionsubdir{"DST_TRKR_G4HIT"} = "pass2_embed";
+    $productionsubdir{"DST_VERTEX"} = "pass2_embed";
 }
 if ($system == 1)
 {
@@ -259,7 +283,51 @@ elsif ($system == 11)
 	$condorfileadd = sprintf("Jet04");
         $systemstring = "pythia8_Jet04";
     }
+    if (defined $embed)
+    {
+	$condorfileadd = sprintf("Jet04");
+        $systemstring = "pythia8_Jet04";
+        $pileupstring = "_sHijing_0_20fm_50kHz_bkg_0_20fm";
+    }
     $specialcondorfileadd{"G4Hits"} = "Jet04";
+}
+elsif ($system == 12)
+{
+    $specialsystemstring{"G4Hits"} = "pythia8_Jet15-";
+    $systemstring = "pythia8_Jet15_";
+    $topdir = sprintf("%s/JS_pp200_signal",$topdir);
+    $condorfileadd = sprintf("Jet15_3MHz");
+    if (defined $nopileup)
+    {
+	$condorfileadd = sprintf("Jet15");
+        $systemstring = "pythia8_Jet15";
+    }
+    if (defined $embed)
+    {
+	$condorfileadd = sprintf("Jet15");
+        $systemstring = "pythia8_Jet15";
+        $pileupstring = "_sHijing_0_20fm_50kHz_bkg_0_20fm";
+    }
+    $specialcondorfileadd{"G4Hits"} = "Jet15";
+}
+elsif ($system == 13)
+{
+    $specialsystemstring{"G4Hits"} = "pythia8_PhotonJet-";
+    $systemstring = "pythia8_PhotonJet_";
+    $topdir = sprintf("%s/JS_pp200_signal",$topdir);
+    $condorfileadd = sprintf("PhotonJet_3MHz");
+    if (defined $nopileup)
+    {
+	$condorfileadd = sprintf("PhotonJet");
+        $systemstring = "pythia8_PhotonJet";
+    }
+    if (defined $embed)
+    {
+	$condorfileadd = sprintf("PhotonJet");
+        $systemstring = "pythia8_PhotonJet";
+        $pileupstring = "_sHijing_0_20fm_50kHz_bkg_0_20fm";
+    }
+    $specialcondorfileadd{"G4Hits"} = "PhotonJet";
 }
 else
 {
@@ -363,12 +431,12 @@ foreach my $rem (keys %removethese)
 	    if (! defined $nopileup && $res2[0] =~ /NoPileUp/)
 	    {
 		print "getfiles ($res[0]): trying to remove $res2[0]\n";
-		die;
+#		die;
 	    }
 	    if (defined $nopileup && $res2[0] !~ /NoPileUp/)
 	    {
 		print "nopileup getfiles ($res[0]): trying to remove $res2[0]\n";
-		die;
+#		die;
 	    }
 	    if (defined $kill)
 	    {
@@ -395,7 +463,10 @@ foreach my $rem (keys %removethese)
 }
 foreach my $condorfile (keys %removecondorfiles)
 {
-#    print "condorfile: $condorfile\n";
+    if (defined $verbose)
+    {
+	print "condorfile: $condorfile\n";
+    }
     if (-f $condorfile)
     {
 	if (defined $kill)
